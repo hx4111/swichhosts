@@ -41,8 +41,13 @@ function createWindow() {
     })
 
     // extensions dev tool
-    var reactDevToolPath = path.join('C:\\Users\\haoxu\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions\\fmkadmapgofadopljbjfkapdkoienihi\\2.3.3_0')
-    // BrowserWindow.addDevToolsExtension(reactDevToolPath)
+    var reactDevToolPath = ''
+    if (process.platform === 'win32') {
+        reactDevToolPath = path.join('C:\\Users\\haoxu\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions\\fmkadmapgofadopljbjfkapdkoienihi\\2.3.3_0')
+    } else {
+        reactDevToolPath = path.join(app.getPath('appData'), 'Google/Chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/2.3.3_0')
+    }
+    BrowserWindow.addDevToolsExtension(reactDevToolPath)
 
 }
 

@@ -3,7 +3,12 @@ const fs = require('fs')
 const readline = require('readline')
 const path = require('path')
 
-const hostPath = path.join('C:\Windows\\System32\\drivers\\etc\\hosts')
+let hostPath = ''
+if (process.platform === 'win32') {
+    hostPath = path.join('C:\Windows\\System32\\drivers\\etc\\hosts')
+} else {
+    hostPath = path.join('/private/etc/hosts')
+}
 
 class Host {
     constructor(hostStr, uri, enable) {
