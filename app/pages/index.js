@@ -4,6 +4,7 @@ import {
   TableBody,
   TableHeader,
   TableHeaderColumn,
+  TableFooter,
   TableRow,
   TableRowColumn,
 } from 'material-ui/Table'
@@ -23,7 +24,8 @@ export default class App extends React.Component {
             hostsArray: [],
             showHosts: [],
             filterIp: null,
-            filterDomain: null
+            filterDomain: null,
+            enableChecked: false
         }
         this.filterInput = this.filterInput.bind(this)
     } 
@@ -73,11 +75,15 @@ export default class App extends React.Component {
         })
     }
 
+    delHost() {
+
+    }
+
     render() {
         return (
             <div>
                 <AppBar title="Host Switch" />
-                <Table>
+                <Table fixedHeader={true} height={"400px"} multiSelectable={true}>
                     <TableHeader>
                         <TableRow>
                             <TableHeaderColumn>IP <TextField className="filter-input" hintText="filter" onChange={this.filterInput.bind(this, 'ip')}/></TableHeaderColumn>
@@ -86,7 +92,7 @@ export default class App extends React.Component {
                             <TableHeaderColumn>option</TableHeaderColumn>
                         </TableRow>
                     </TableHeader>
-                    <TableBody>
+                    <TableBody preScanRows={false}>
                         {
                             this.state.showHosts.map( (host, index) => {
                                 return (
@@ -104,6 +110,11 @@ export default class App extends React.Component {
                         }
                     </TableBody>
                 </Table>
+                <div className="submit-block">
+                    <RaisedButton className="opButton" label="删除" primary={true} onClick={this.delHost}/>
+                    <RaisedButton className="opButton" label="新增" primary={true} />
+                    <RaisedButton className="opButton" label={ this.state.enableChecked ? "启用" : "禁用" } primary={true} />
+                </div>
             </div>
         )
     }
