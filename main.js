@@ -47,7 +47,7 @@ function createWindow() {
     } else {
         reactDevToolPath = path.join(app.getPath('appData'), 'Google/Chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/2.3.3_0')
     }
-    BrowserWindow.addDevToolsExtension(reactDevToolPath)
+    // BrowserWindow.addDevToolsExtension(reactDevToolPath)
 
 }
 
