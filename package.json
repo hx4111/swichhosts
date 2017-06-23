@@ -8,7 +8,7 @@
         "test": "echo \"Error: no test specified\" && exit 1",
         "package": "electron-packager ./ SwitchHost --platform=win32 --arch=x64 --overwrite"
     },
-    "author": "",
+    "author": "haoxu",
     "license": "ISC",
     "dependencies": {
         "electron": "^1.6.11",
@@ -26,6 +26,7 @@
         "babel-preset-react": "^6.24.1",
         "css-loader": "^0.28.4",
         "electron-packager": "^8.7.1",
+        "electron-windows-installer": "^1.4.4",
         "gulp": "^3.9.1",
         "gulp-run": "^1.7.1",
         "less": "^2.7.2",
