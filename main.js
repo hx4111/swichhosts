@@ -7,7 +7,7 @@ const BrowserWindow = electron.BrowserWindow
 const path = require('path')
 const url = require('url')
 
-let isDevelopment = true;
+let isDevelopment = false;
 if (isDevelopment) {
     require('electron-reload')(__dirname, {
         ignored: /node_modules|[\/\\]\./
@@ -20,7 +20,7 @@ let mainWindow
 
 function createWindow() {
     // Create the browser window.
-    mainWindow = new BrowserWindow({ width: 800, height: 600 })
+    mainWindow = new BrowserWindow({ width: 1000, height: 700 })
 
     // and load the index.html of the app.
     mainWindow.loadURL(url.format({
@@ -30,7 +30,7 @@ function createWindow() {
     }))
 
     // Open the DevTools.
-    mainWindow.webContents.openDevTools()
+    // mainWindow.webContents.openDevTools()
 
     // Emitted when the window is closed.
     mainWindow.on('closed', function() {
@@ -47,7 +47,7 @@ function createWindow() {
     } else {
         reactDevToolPath = path.join(app.getPath('appData'), 'Google/Chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/2.3.3_0')
     }
-    BrowserWindow.addDevToolsExtension(reactDevToolPath)
+    // BrowserWindow.addDevToolsExtension(reactDevToolPath)
 
 }
 
