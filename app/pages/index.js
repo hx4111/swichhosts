@@ -14,6 +14,10 @@ class HostOp extends Host {
     }
 }
 
+const dialogStyle = {
+    width: '30%',
+}
+
 export default class App extends React.Component {
     constructor(props) {
         super(props)
@@ -22,17 +26,23 @@ export default class App extends React.Component {
             filterIp: null,
             filterDomain: null,
             enableChecked: false,
-            delDialogOpen: false,
-            preDelHost: null
+            dialogOpen: false,
+            preDelHost: null,
+            opType: null,
+            textProp: {
+                ip: null,
+                domain: null
+            },
+            editHostProp: null
         }
         
         this.filterInput = this.filterInput.bind(this)
-        this.handleDelClose = this.handleDelClose.bind(this)
-        this.handleDelEnter = this.handleDelEnter.bind(this)
-        // this.delHost = this.delHost.bind(this)
-        // this.delHostList = this.delHostList.bind(this)
-        // this.enableHostList = this.enableHostList.bind(this)
-        // this.selectRow = this.selectRow.bind(this)
+        this.handleDialogClose = this.handleDialogClose.bind(this)
+        this.handleDialogSubmit = this.handleDialogSubmit.bind(this)
+        this.delHostList = this.delHostList.bind(this)
+        this.enableHostList = this.enableHostList.bind(this)
+        this.selectRow = this.selectRow.bind(this)
+        this.addHost = this.addHost.bind(this)
     } 
 
     componentDidMount() {
@@ -67,17 +77,20 @@ export default class App extends React.Component {
         this.state.hostsArray.map( (host) => {
             host.visiable = true
             if (filterIpStr && filterIpStr.length > 0) {
-                if (host.ip.indexOf(filterIpStr) >= 0) {
+                if (host.ip.indexOf(filterIpStr) < 0) {
                     host.visiable = false
                 }
             }
             if (filterDomainStr && filterDomainStr.length > 0) {
-                if (host.domain.indexOf(filterDomainStr) >= 0) {
+                if (host.domain.indexOf(filterDomainStr) < 0) {
                     host.visiable = false
                 }
             }
         })
-        this.dispatchHostFile(this.state.hostsArray)
+
+        this.setState({
+            hostsArray: this.state.hostsArray
+        })
     }
 
     enableHost(host, e) {
@@ -94,54 +107,119 @@ export default class App extends React.Component {
         this.dispatchHostFile(tempArray)
     }
 
-    delHost(host) {
+    addHost() {
         this.setState({
-            delDialogOpen: true,
-            preDelHost: host
+            dialogOpen: true,
+            opType: 3
+        })
+    }
+
+    editHost(host, e) {
+        e.stopPropagation()
+        this.setState({
+            editHostProp: host,
+            dialogOpen: true,
+            opType: 4
+        })
+    }
+
+    delHost(host, e) {
+        e.stopPropagation()
+        this.setState({
+            dialogOpen: true,
+            preDelHost: host,
+            opType: 1
         })
     }
 
     delHostList() {
-        let tempArray = []
-        // for (let i of this.state.selArray) {
-
-        // }
+        this.setState({
+            dialogOpen: true,
+            opType: 2
+        })
     }
 
     enableHostList() {
-
+        this.state.enableChecked = !this.state.enableChecked
+        this.state.hostsArray.map( host => {
+            if (host.checked) {
+                host.enable = this.state.enableChecked
+            }
+        })
+        this.dispatchHostFile(this.state.hostsArray)
     }
 
-    handleDelClose() {
+    handleDialogClose() {
         this.setState({
-            delDialogOpen: false,
+            dialogOpen: false,
             preDelHost: null
         })
     }
 
-    handleDelEnter() {
-        let index = this.state.hostsArray.indexOf(this.state.preDelHost)
-        if (index >=0 ) {
-            this.state.hostsArray.splice(index, 1)
+    handleDialogSubmit() {
+        if (this.state.opType == 1) {
+            let index = this.state.hostsArray.indexOf(this.state.preDelHost)
+            if (index >=0 ) {
+                this.state.hostsArray.splice(index, 1)
+                this.dispatchHostFile(this.state.hostsArray)
+            }
+        } else if (this.state.opType == 2) {
+            for (let i = this.state.hostsArray.length - 1; i >= 0; i--) {
+                let host = this.state.hostsArray[i]
+                if (host.checked) {
+                    this.state.hostsArray.splice(i, 1)
+                }
+            }
             this.dispatchHostFile(this.state.hostsArray)
+        } else if (this.state.opType == 3) {
+            let tempHost = new Host({ip: this.state.textProp.ip, domain: this.state.textProp.domain})
+            this.state.hostsArray.unshift(new HostOp(tempHost))
+            this.dispatchHostFile(this.state.hostsArray)
+        } else if (this.state.opType == 4) {
+            let editHost = this.state.hostsArray.filter( host => host.id == this.state.editHostProp.id)
+            if (editHost) {
+                editHost.ip = this.state.editHostProp.ip
+                editHost.domain = this.state.editHostProp.domain
+                this.dispatchHostFile(this.state.hostsArray)
+            }
         }
-        this.handleDelClose()
+        
+        this.handleDialogClose()
     }
 
-    selectRow(selected) {
-        console.info(selected)
-        if (selected === 'all') {
-            let tempArray = new Array(this.state.showHosts.length).fill(1).map( (v, i) => v = i )
-            this.setState({
-                selArray: tempArray
-            })
-        } else if (selected === 'none') {
-            this.setState({
-                selArray: []
-            })
+    selectRow(index) {
+        console.info('into checked ! ' + index)
+        let tempArray = this.state.hostsArray.filter( host => { return host.visiable })
+        
+        tempArray.map( host => host.checked = false)
+        if (index === 'all') {
+            tempArray.map( host => host.checked = true)
+        } else if (index === 'none') {
+            
         } else {
+            for (let i of index) {
+                tempArray[i].checked = true
+            }
+        }
+        this.setState({
+            hostsArray: this.state.hostsArray
+        })
+    }
+
+    handleText(type, prop, event) {
+        if (type === 'add') {
+            let tempTextProp = this.state.textProp
+            
+            tempTextProp[prop] = event.target.value
             this.setState({
-                selArray: selected
+                textProp: tempTextProp
+            })
+        } else if (type === 'edit') {
+            let tempEditProp = this.state.editHostProp
+            
+            tempEditProp[prop] = event.target.value
+            this.setState({
+                editHostProp: tempEditProp
             })
         }
     }
@@ -150,7 +228,6 @@ export default class App extends React.Component {
         this.setState({
             hostsArray: hostsArray
         })
-        this.filterInput()
         HostSwitch.setHosts(hostsArray)
     }
 
@@ -159,11 +236,11 @@ export default class App extends React.Component {
             <FlatButton 
                 label = "取消" 
                 primary = { true }
-                onTouchTap = { this.handleDelClose } />, 
+                onTouchTap = { this.handleDialogClose } />, 
             <FlatButton 
                 label = "确认" 
                 primary = { true }
-                onTouchTap = { this.handleDelEnter } />
+                onTouchTap = { this.handleDialogSubmit } />
         ];
     
         return (
@@ -178,16 +255,16 @@ export default class App extends React.Component {
                             <TableHeaderColumn>option</TableHeaderColumn>
                         </TableRow>
                     </TableHeader>
-                    <TableBody showRowHover={true}>
+                    <TableBody showRowHover={true} deselectOnClickaway={false}>
                         {
                             this.state.hostsArray.map( host => {
                                 return !host.visiable ? null : (
-                                    <TableRow key={host.id}>
+                                    <TableRow key={host.id} selected={host.checked}>
                                         <TableRowColumn>{ host.ip }</TableRowColumn>
                                         <TableRowColumn>{ host.domain }</TableRowColumn>
                                         <TableRowColumn><Toggle label="Enable" defaultToggled={host.enable} onClick={this.enableHost.bind(this, host)}/></TableRowColumn>
                                         <TableRowColumn>
-                                            <RaisedButton className="opButton" label="Edit" primary={true} />
+                                            <RaisedButton className="opButton" label="Edit" primary={true} onClick={this.editHost.bind(this, host)}/>
                                             <RaisedButton className="opButton" label="Delete" primary={true} onClick={this.delHost.bind(this, host)}/>
                                         </TableRowColumn>
                                     </TableRow>
@@ -198,16 +275,32 @@ export default class App extends React.Component {
                 </Table>
                 <div className="submit-block">
                     <RaisedButton className="opButton" label="删除" primary={true} onClick={this.delHostList}/>
-                    <RaisedButton className="opButton" label="新增" primary={true} />
-                    <RaisedButton className="opButton" label={ this.state.enableChecked ? "启用" : "禁用" } primary={true} onClick={this.enableHostList} />
+                    <RaisedButton className="opButton" label="新增" primary={true} onClick={this.addHost}/>
+                    <RaisedButton className="opButton" label={ this.state.enableChecked ? "禁用" : "启用" } primary={true} onClick={this.enableHostList} />
                 </div>
                 <Dialog
                     actions={actions}
                     modal={false}
-                    open={this.state.delDialogOpen}
-                    onRequestClose={this.handleDelClose}
+                    open={this.state.dialogOpen}
+                    onRequestClose={this.handleDialogClose}
+                    contentStyle={dialogStyle}
                 >
-                    确认删除？
+                    {
+                        (() => {
+                            switch(this.state.opType) {
+                                case 1: return '确认删除？'
+                                case 2: return '确认删除选中条目？'
+                                case 3: return (<div className="host-dialog-add">
+                                                    <TextField hintText="IP" onChange={this.handleText.bind(this, 'add', 'ip')}/><br/>
+                                                    <TextField hintText="domain" onChange={this.handleText.bind(this, 'add', 'domain')}/><br/>
+                                                </div>)
+                                case 4: return (<div className="host-dialog-add">
+                                                    <TextField hintText="IP" value={this.state.editHostProp.ip} onChange={this.handleText.bind(this, 'edit', 'ip')}/><br/>
+                                                    <TextField hintText="domain" value={this.state.editHostProp.domain} onChange={this.handleText.bind(this, 'edit', 'domain')}/><br/>
+                                                </div>)
+                            }
+                        })()
+                    }
                 </Dialog>
             </div>
         )
