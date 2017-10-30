@@ -21,7 +21,10 @@ gulp.task('webpack', function(callback) {
 })
  
 gulp.task('installer', function(done) {
-    winInstaller({appDirectory: './SwitchHost-win32-x64', outputDirectory: './release'})
-        .then(done)
-        .catch(done);
+    winInstaller({
+        appDirectory: './SwitchHost-win32-x64', 
+        // outputDirectory: './release'
+        iconUrl: 'https://avatars1.githubusercontent.com/u/9532703',
+        exe: 'SwitchHost.exe'
+    })
 });
