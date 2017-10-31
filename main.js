@@ -18,17 +18,30 @@ if (isDevelopment) {
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
 
+let defaultConfig = {
+    mode: 'test'  //'production'
+}
+process.env.NODE_ENV = defaultConfig.mode
+
 function createWindow() {
     // Create the browser window.
-    mainWindow = new BrowserWindow({ width: 1000, height: 700 })
+    mainWindow = new BrowserWindow({ 
+        width: 1000, 
+        height: 700,
+        titleBarStyle: 'hidden'
+    })
 
     // and load the index.html of the app.
-    mainWindow.loadURL(url.format({
-        pathname: path.join(__dirname, 'index.html'),
-        protocol: 'file:',
-        slashes: true
-    }))
-
+    if (process.env.NODE_ENV == 'production') {
+        mainWindow.loadURL(url.format({
+            pathname: path.join(__dirname, 'index.html'),
+            protocol: 'file:',
+            slashes: true
+        }))
+    } else {
+        mainWindow.loadURL('http://localhost:8080')
+    }
+    
     // Open the DevTools.
     // mainWindow.webContents.openDevTools()
 

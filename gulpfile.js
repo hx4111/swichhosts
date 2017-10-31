@@ -2,7 +2,6 @@ var gulp = require('gulp')
 var webpack = require("webpack")
 var run = require('gulp-run')
 var webpackConfig = require('./webpack.config.js')
-var winInstaller = require('electron-windows-installer');
 
 var isWatch = true
 
@@ -19,9 +18,3 @@ gulp.task('webpack', function(callback) {
         console.log(stats.toString());
     });
 })
- 
-gulp.task('installer', function(done) {
-    winInstaller({appDirectory: './SwitchHost-win32-x64', outputDirectory: './release'})
-        .then(done)
-        .catch(done);
-});
