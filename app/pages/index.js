@@ -4,7 +4,7 @@ import { RaisedButton, FlatButton, Toggle, AppBar, TextField, Dialog } from 'mat
 
 import '../less/index.less' 
 
-import { Host, HostSwitch } from '../js/hostfile.js'
+import { Host, hostSwitch as HostSwitch } from '../js/hostfile.js'
 
 class HostOp extends Host {
     constructor({ip, domain, enable}) {

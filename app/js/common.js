@@ -1,26 +1,29 @@
 import path from 'path'
 
-const param = {
-    WIN: 'win32',
-    OS: 'darwin',
+class Settings {
 
-    winHostPath: path.join('C:\Windows\\System32\\drivers\\etc\\hosts'),
-    osHostPath: path.join('/private/etc/hosts')
-}
-
-function getHostPath() {
-    let hostsPath = '',
-        platform = process.platform
-
-    if (platform === param.WIN) {
-        hostsPath = param.winHostPath
-    } else if (platform === param.OS) {
-        hostsPath = param.osHostPath
+    get platform() {
+        return process.platform
     }
-    return hostsPath
+
+    get isDarwin() {
+        return process.platform === 'darwin'
+    }
+
+    get isWin32() {
+        return process.platform === 'win32'
+    }
+
+    get hostFilePath() {
+        if (this.isDarwin) {
+            return path.join('/etc/hosts')
+        } else if (this.isWin32) {
+            return path.join('C:\Windows\\System32\\drivers\\etc\\hosts') 
+        }
+    }
 }
 
+const settings = new Settings()
 export {
-    param,
-    getHostPath
+    settings
 }

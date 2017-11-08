@@ -5,10 +5,10 @@ const CleanWebpackPlugin = require('clean-webpack-plugin')
 module.exports = {
     devtool: 'eval-source-map', //配置生成Source Maps，选择合适的选项
 
-    entry: __dirname + '/app/index.js',
+    entry: path.join(__dirname, '../app/index.js'),
 
     output: {
-        path: __dirname + '/dist',
+        path: path.join(__dirname, '../dist'),
         filename: 'bundle.js'
     },
 
@@ -16,14 +16,16 @@ module.exports = {
         rules: [
             {
                 test: /\.js/,
+                include: path.join(__dirname, '../app'),
                 use: 'babel-loader'
             },
             {
                 test: /\.less/,
+                include: path.join(__dirname, '../app'),
                 use: [
-                    'less',
                     'style-loader',
-                    'css-loader'
+                    'css-loader',
+                    'less-loader'
                 ]
             }
         ]
@@ -31,5 +33,7 @@ module.exports = {
 
     plugins: [
         new CleanWebpackPlugin([path.join(__dirname, '../dist')])
-    ]
+    ],
+
+    target: 'electron-renderer'
 }

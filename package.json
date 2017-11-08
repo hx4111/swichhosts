@@ -4,8 +4,7 @@
     "description": "",
     "main": "main.js",
     "scripts": {
-        "start": "webpack --watch",
-        "dev": "webpack-dev-server --open"
+        "dev": "webpack-dev-server --config ./webpack/webpack.dev.js --inline --hot"
     },
     "author": "haoxu",
     "license": "ISC",

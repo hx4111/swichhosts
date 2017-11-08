@@ -2,7 +2,7 @@
 import fs from 'fs'
 import readline from 'readline'
 import path from 'path'
-import { getHostPath } from './common' 
+import { settings } from './common' 
 
 class Host {
     constructor({ip, domain, enable}) {
@@ -20,17 +20,18 @@ class Host {
         return str
     }
 }
-Host.cnt = 1 // 静态属性
+Host.cnt = 1
 
-const HostSwitch = {
+class HostSwitch {
+
     getHosts() {
         let hostsArray = []
         let rlHosts = readline.createInterface({
-            input: fs.createReadStream(getHostPath())
+            input: fs.createReadStream(settings.hostFilePath)
         })
         
+        let reg = /(\d{1,3}\.)[3]\d{1,3}/
         rlHosts.on('line', (line) => {
-            let reg = /\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}/
             if (reg.test(line)) {
                 let ip, domain, enable
                 let splitArr = line.trim().split(/\s|\t/).filter((item) => item)
@@ -57,10 +58,10 @@ const HostSwitch = {
                 resolve(hostsArray)
             })
         })
-    },
+    }
 
     setHosts(hostsArray) {
-        let wrHosts = fs.createWriteStream(getHostPath(), { flags:'w+' })
+        let wrHosts = fs.createWriteStream(settings.hostFilePath, { flags:'w+' })
         for (let host of hostsArray) {
             wrHosts.write(host.toString())
         }
@@ -71,7 +72,9 @@ const HostSwitch = {
     }
 }
 
-module.exports = {
-    HostSwitch,
+const hostSwitch = new HostSwitch()
+
+export {
+    hostSwitch,
     Host
 }
